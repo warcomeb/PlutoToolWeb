@@ -114,22 +114,26 @@
                             <textarea class="form-control" id="payee-form-note" rows="3" placeholder="Note" ></textarea>
                         </div>
                     
+                        <div class="alert alert-success d-none" role="alert" id="payee-form-success">
+                            &nbsp;
+                        </div>
+                            
+                        <div class="alert alert-danger d-none" role="alert" id="payee-form-error">
+                            &nbsp;
+                        </div>
+                            
+                        <div class="alert alert-primary d-none" role="alert" id="payee-form-loading">
+                            <div class="spinner-border spinner-border-sm" role="status">
+                                <!-- <span class="visually-hidden">Loading...</span> -->
+                            </div>
+                            &nbsp; <span>Loading...</span>
+                        </div>
+
                         <div class="form-group">
-                            <button class="btn btn-primary" type="submit" id="payee-form-save" onclick="save_payee()">Salva</button>
+                            <button class="btn btn-primary" id="payee-form-save" onclick="save_payee()">Salva</button>
                             <button class="btn btn-primary" type="reset" id="payee-form-reset">Reset</button>
                         </div>
                     
-                        <div class="alert alert-success d-none" role="alert" id="payee-form-success">
-                        &nbsp;
-                        </div>
-                        
-                        <div class="alert alert-danger d-none" role="alert" id="payee-form-error">
-                        &nbsp;
-                        </div>
-                        
-                        <div class="alert alert-primary d-none" role="alert" id="payee-form-loading">
-                            <i class="fas fa-spinner fa-spin"></i>&nbsp;Loading...
-                        </div>
                     </form>
                 </div>
             </div>
@@ -144,7 +148,94 @@
 
     function save_payee()
     {
-        console.log("save_payee");
+        var formData = 
+        {
+            'name'              : $('#payee-form-name').val(),
+            'type'              : $('#payee-form-ptype').val(),
+            'email'             : $('#payee-form-email').val(),
+            'phone'             : $('#payee-form-phone').val(),
+            'address'           : $('#payee-form-address').val(),
+            'city'              : $('#payee-form-city').val(),
+            'district'          : $('#payee-form-district').val(),
+            'zip'               : $('#payee-form-zip').val(),
+            'country'           : $('#payee-form-country').val(),
+            'vat'               : $('#payee-form-vat').val(),
+            'nin'               : $('#payee-form-nin').val(),
+            'note'              : $('#payee-form-note').val(),
+        };
+
+        // Disable buttons
+        $('#payee-form-save').attr("disabled","disabled");
+        $('#payee-form-reset').attr("disabled","disabled");
+        // Show loading gift
+        $('#payee-form-loading').removeClass('d-none').delay(800);
+
+                // $.ajax({
+                //     type        : 'POST',
+                //     url         : '/prjform/' + $('#payee-form-type').val() + 'payee.form.php',
+                //     data        : formData, 
+                //     dataType    : 'json',
+                //     encode      : true
+                // })
+                // .done(function(data)
+                // {
+                //     console.log("INFO: #payee-form ajax done!");
+
+                //     // NO ERRORS
+                //     if (0 === data['status'])
+                //     {
+                //         // Show success message
+                //         $('#payee-form-loading').addClass('d-none');
+                //         $('#payee-form-error').addClass('d-none');
+
+                //         // TODO: write success message
+                //         $('#payee-form-success').html('<i class="fas fa-check"></i>');
+                //         if ("edit" === $('#payee-form-type').val())
+                //         {
+                //             $('#payee-form-success').append(' Modifica effettuata con successo!');
+                //         }
+                //         else if ("add" === $('#payee-form-type').val())
+                //         {
+                //             $('#payee-form-success').append(' Salvataggio effettuato con successo!');
+                //         }
+                //         $('#payee-form-success').removeClass('d-none').delay(1000);
+
+                //         // Redirect to view page...
+                //         $(location).attr('href', '/records/payee/view/' + data['id']);
+                //     }
+                //     else if (1 === data['status'])
+                //     {
+                //         // Write text into error div message
+                //         $('#payee-form-error').html('<i class="fas fa-times"></i>');
+                //         $('#payee-form-error').append(' ' + data['status']);
+
+                //         // Show error message
+                //         $('#payee-form-loading').addClass('d-none');
+                //         $('#payee-form-success').addClass('d-none');
+                //         $('#payee-form-error').removeClass('d-none').delay(1000);
+
+                //         // Enable buttons
+                //         $('#payee-form-save').removeAttr("disabled");
+                //         $('#payee-form-reset').removeAttr("disabled");
+                //     }
+                // })
+                // .fail(function(jqXHR, textStatus)
+                // {
+                //     console.log("INFO: #payee-form ajax fail!");
+
+                //     // Write text into error div message
+                //     $('#payee-form-error').html('<i class="fas fa-times"></i>');
+                //     $('#payee-form-error').append(' ERR[001] Ajax request fail!');
+
+                //     // Show error message
+                //     $('#payee-form-loading').addClass('d-none');
+                //     $('#payee-form-success').addClass('d-none');
+                //     $('#payee-form-error').removeClass('d-none').delay(1000);
+
+                //     // Enable buttons
+                //     $('#payee-form-save').removeAttr("disabled");
+                //     $('#payee-form-reset').removeAttr("disabled");
+                // });
     }
 
     $(document).ready( function () 
