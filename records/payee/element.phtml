@@ -1,0 +1,191 @@
+<?php
+    $displayType = ($type == "view") ? "disabled" : "";
+    $isError = FALSE;
+    $rows = NULL;
+
+    if (($type == "view") || ($type == "edit"))
+    {
+        $query = "SELECT P.Id, P.Name, P.Email, P.Phone, P.Address, P.City, P.District, " .
+        "P.ZipCode, P.Country, P.VATID, P.NIN, P.Active, P.Note, " .
+        "T.Id AS TypeId, T.Name AS TypeName " .
+        "FROM " . PRJ_DB_TABLE_PAYEE . " P " .
+        "JOIN " . PRJ_DB_TABLE_PAYEE_TYPE . " T ON P.PayeeTypeId=T.Id " . 
+        "WHERE P.Id={$_GET['id']}";
+
+        $result = $db->query($query);
+        if ($result)
+        {
+            $rows = $result->fetchAll(PDO::FETCH_ASSOC);
+            if ((count($rows) == 0) || (count($rows) > 1))
+            {
+                $isError = TRUE;
+            }
+        }
+        else
+        {
+            $isError = TRUE;
+        }
+    }
+
+    if ($isError == FALSE)
+    {
+?>
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2" id="payee-page-title">
+            <?php  
+                if      ($type == "view") echo "Visualizza Benificiario";
+                else if ($type == "add")  echo "Nuovo Benificiario";
+                else if ($type == "edit") echo "Modifica Benificiario";
+            ?>
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+                <a class="btn btn-sm btn-outline-primary" href="/records/payee/index.php" role="button"><i class="bi bi-arrow-left-square"></i>&nbsp;Indietro</a>
+            </div>
+        </div>
+    </div> 
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <form id="payee-form" class="row g-3" data-parsley-validate="">
+                <input type="hidden" id="payee-form-type" value="<?php echo $type ?>" />
+
+                <div class="form-group col-md-2">
+                    <label for="payee-form-id">Id</label>
+                    <input type="text" class="form-control" id="payee-form-id" placeholder="" value="<?php echo (isset($rows[0]['Id'])) ? $rows[0]['Id'] : "0"; ?>" disabled>
+                </div>
+                <div class="form-group col-md-10">
+                    <label for="payee-form-name">Nome</label>
+                    <input type="text" class="form-control" id="payee-form-name" placeholder="" data-parsley-minlength="3" autocomplete="off" required value="<?php echo (isset($rows[0]['Name'])) ? $rows[0]['Name'] : ""; ?>" <?php echo $displayType; ?>>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="payee-form-address">Indirizzo</label>
+                    <input type="text" class="form-control" id="payee-form-address" placeholder="" data-parsley-minlength="5" value="<?php echo (isset($rows[0]['Address'])) ? $rows[0]['Address'] : ""; ?>" <?php echo $displayType; ?>>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="payee-form-city">Città</label>
+                    <input type="text" class="form-control" id="payee-form-city" placeholder="" data-parsley-minlength="3" value="<?php echo (isset($rows[0]['City'])) ? $rows[0]['City'] : ""; ?>" <?php echo $displayType; ?>>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label for="payee-form-district">Provincia</label>
+                    <input type="text" class="form-control" id="payee-form-district" placeholder="" data-parsley-provincia="" value="<?php echo (isset($rows[0]['District'])) ? $rows[0]['District'] : ""; ?>" <?php echo $displayType; ?>>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="payee-form-zip">CAP</label>
+                    <input type="text" class="form-control" id="payee-form-zip" placeholder="" data-parsley-zip-code="" value="<?php echo (isset($rows[0]['ZipCode'])) ? $rows[0]['ZipCode'] : ""; ?>" <?php echo $displayType; ?>>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="payee-form-country">Paese</label>
+<?php
+    if ($type === "view")
+        echo "<input type=\"text\" class=\"form-control\" id=\"payee-form-country\" placeholder=\"{$rows[0]['Country']}\" disabled>";
+    else
+        MyUtility::printCountrySelectForm("form-control", "payee-form-country", "IT"); 
+?> 
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="payee-form-email">Email</label>
+                    <input type="email" class="form-control" id="payee-form-email" placeholder="" data-parsley-type="email" autocomplete="off" value="<?php echo (isset($rows[0]['Email'])) ? $rows[0]['Email'] : ""; ?>" <?php echo $displayType; ?>>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="payee-form-phone">Telefono</label>
+                    <input type="text" class="form-control" id="payee-form-phone" placeholder="" data-parsley-phone="" autocomplete="off"  value="<?php echo (isset($rows[0]['Phone'])) ? $rows[0]['Phone'] : ""; ?>" <?php echo $displayType; ?>>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="payee-form-vat">P. IVA</label>
+                    <input type="text" class="form-control" id="payee-form-vat" placeholder="" data-parsley-vat="" value="<?php echo (isset($rows[0]['VATID'])) ? $rows[0]['VATID'] : ""; ?>" <?php echo $displayType; ?>>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="payee-form-nin">Codice Fiscale</label>
+                    <input type="text" class="form-control" id="payee-form-nin" placeholder="" data-parsley-ninsupplier="" value="<?php echo (isset($rows[0]['NIN'])) ? $rows[0]['NIN'] : ""; ?>" <?php echo $displayType; ?>>
+                </div>
+
+                <div class="form-group col-md-12">
+                    <label for="payee-form-ptype">Tipo</label>
+                    <div class="btn-group-toggle" data-toggle="buttons">
+<?php
+if ($type === "view")
+{
+    echo "<input type=\"text\" class=\"form-control\" id=\"payee-form-ptype\" placeholder=\"{$rows[0]['TypeName']}\" disabled>";
+}
+else
+{
+    $query = "SELECT * FROM " . PRJ_DB_TABLE_PAYEE_TYPE . " ORDER BY Name";
+
+    $typeid = (isset($rows[0]['TypeId']) ? $rows[0]['TypeId'] : 0);
+    $result = $db->query($query);
+    if ($result)
+    {
+        $rowsPayee = $result->fetchAll(PDO::FETCH_ASSOC);
+        if ($rowsPayee)
+        {
+            echo "<select id=\"payee-form-ptype\" class=\"form-control selectpicker\">\n";
+            foreach ($rowsPayee as $rowPayee)
+            {
+                $selected = "";
+                if ($rowPayee['Id'] === $typeid) $selected = "selected";
+                else $selected = "";
+             
+                echo "<option value=\"{$rowPayee['Id']}\" {$selected}>{$rowPayee['Name']}</option>\n";
+            }
+            echo "</select>\n";
+        }
+    }                            
+}
+?>         
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="payee-form-note">Note</label>
+                    <textarea class="form-control" id="payee-form-note" rows="3" placeholder="Note" <?php echo $displayType; ?>>
+                    <?php echo (isset($rows[0]['Note']) ? $rows[0]['Note'] : ""); ?></textarea>
+                    </textarea>
+                </div>
+
+<?php 
+if ($type != "view")
+{
+?>
+                <div class="form-group">
+                    <button class="btn btn-primary"  onclick="save_payee()" id="payee-form-save">Save</button>
+                    <button class="btn btn-primary" type="reset" id="payee-form-reset">Reset</button>
+                </div>
+
+                <div class="alert alert-success d-none" role="alert" id="payee-form-success">
+                    &nbsp;
+                </div>
+                                
+                <div class="alert alert-danger d-none" role="alert" id="payee-form-error">
+                    &nbsp;
+                </div>
+                                
+                <div class="alert alert-primary d-none" role="alert" id="payee-form-loading">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <!-- <span class="visually-hidden">Loading...</span> -->
+                    </div>
+                    &nbsp; <span>Loading...</span>
+                </div>
+<?php
+}
+?>
+            </form>
+        </div>
+    </div>
+</div>
+
+<?php
+    }
+    else
+    {
+        // TODO
+    }
+?>

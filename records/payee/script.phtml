@@ -1,0 +1,82 @@
+<script>
+function save_payee()
+{
+    var formData = 
+    {
+        'action'            : $('#payee-form-type').val(),
+        'name'              : $('#payee-form-name').val(),
+        'type'              : $('#payee-form-ptype').val(),
+        'email'             : $('#payee-form-email').val(),
+        'phone'             : $('#payee-form-phone').val(),
+        'address'           : $('#payee-form-address').val(),
+        'city'              : $('#payee-form-city').val(),
+        'district'          : $('#payee-form-district').val(),
+        'zip'               : $('#payee-form-zip').val(),
+        'country'           : $('#payee-form-country').val(),
+        'vat'               : $('#payee-form-vat').val(),
+        'nin'               : $('#payee-form-nin').val(),
+        'note'              : $('#payee-form-note').val(),
+    };
+
+    // Disable buttons
+    $('#payee-form-save').attr("disabled","disabled");
+    $('#payee-form-reset').attr("disabled","disabled");
+    // Show loading gift
+    $('#payee-form-loading').removeClass('d-none').delay(800);
+
+
+    $.ajax({
+        type        : 'POST',
+        url         : '/records/payee/form.php',
+        data        : formData, 
+        dataType    : 'json',
+        encode      : true,
+        success: function(data){ 
+            console.log(data)
+            console.log(data['query'])
+
+            // Valid payee saved!
+            if (0 !== data['id'])
+            {
+                // Show success message
+                $('#payee-form-loading').addClass('d-none');
+                $('#payee-form-error').addClass('d-none');
+
+                // TODO: write success message
+                $('#payee-form-success').html('<i class="bi bi-check-square-fill"></i>');
+                if ("edit" === $('#payee-form-type').val())
+                {
+                    $('#payee-form-success').append(' Modifica effettuata con successo!');
+                }
+                else if ("add" === $('#payee-form-type').val())
+                {
+                    $('#payee-form-success').append(' Salvataggio effettuato con successo!');
+                }
+                $('#payee-form-success').removeClass('d-none').delay(1000);
+
+                // Redirect to table page...
+                $(location).attr('href', '/records/payee/index.php?action=view&id=' + data['id']);
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log("ERROR: #payee-form ajax fail with " + errorThrown);
+            //console.log(XMLHttpRequest.statusText);
+            //console.log(textStatus);   
+
+            // FIXME: manage better the error type!
+            // Write text into error div message
+            $('#payee-form-error').html('<i class="bi bi-exclamation-square-fill"></i>');
+            $('#payee-form-error').append(' ERR[' + XMLHttpRequest.status + '] ' + XMLHttpRequest.statusText);
+
+            // Show error message
+            $('#payee-form-loading').addClass('d-none');
+            $('#payee-form-success').addClass('d-none');
+            $('#payee-form-error').removeClass('d-none').delay(1000);
+
+            // Enable buttons
+            $('#payee-form-save').removeAttr("disabled");
+            $('#payee-form-reset').removeAttr("disabled");
+        }  
+    })
+}
+</script>

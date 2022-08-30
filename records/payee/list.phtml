@@ -1,0 +1,85 @@
+<div class="container-fluid">
+
+<!-- Page Heading -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Beneficiari</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group mr-2">
+            <a class="btn btn-sm btn-outline-primary" href="/records/payee/index.php?action=add" role="button"><i class="bi bi-plus-square"></i>&nbsp;Aggiungi</a>
+        </div>
+    </div>
+</div> 
+<?php
+
+// Get the user list
+$query = "SELECT P.Id, P.Name, P.Active, P.City, " .
+         "T.Name as TypeName " .
+         "FROM " . PRJ_DB_TABLE_PAYEE . " P " .
+         "JOIN " . PRJ_DB_TABLE_PAYEE_TYPE . " T ON P.PayeeTypeId=T.Id " .
+         "ORDER BY P.Name";
+
+$result = $db->query($query);
+if ($result)
+{
+    $rows = $result->fetchAll(PDO::FETCH_ASSOC);
+    if ($rows)
+    {
+        echo "<div class=\"table-responsive\">\n";
+        echo "\t<table id=\"payee-list-table\" class=\"table table-striped table-bordered\" style=\"width:100%\">\n";
+        echo "\t\t<thead>\n";
+        echo "\t\t\t<tr>\n";
+        echo "\t\t\t\t<th>Id</th>\n";
+        echo "\t\t\t\t<th>Nome</th>\n";
+        echo "\t\t\t\t<th>Città</th>\n";
+        echo "\t\t\t\t<th>Tipo</th>\n";
+        echo "\t\t\t\t<th>&nbsp;</th>\n";
+        echo "\t\t\t</tr>\n";
+        echo "\t\t</thead>\n";
+        echo "\t\t<tbody>\n";
+
+        // Scan the DB elements
+        foreach ($rows as $row)
+        {
+            echo "\t\t\t<tr>\n";
+            // Print Pluto-ID
+            echo "\t\t\t\t<td>{$row['Id']}</td>\n";
+            // Print account name with type icon.
+            echo "\t\t\t\t<td>{$row['Name']}</td>\n";
+            echo "\t\t\t\t<td>{$row['City']}</td>\n";
+            echo "\t\t\t\t<td>{$row['TypeName']}</td>\n";
+
+            // Print command buttons... delete is not usable
+            echo "\t\t\t\t<td>";
+            echo "<div class=\"btn-group\" role=\"group\" aria-label=\"Commands\">";
+            echo "<a class=\"btn btn-primary btn-sm\" href=\"/records/payee/index.php?action=view&id={$row['Id']}\" role=\"button\"><i class=\"bi bi-eye\"></i></a>";
+            if ($row['Id'] == 1)
+                echo "<a class=\"btn btn-secondary btn-sm disabled\" href=\"#\" role=\"button\"><i class=\"bi bi-pencil-square\"></i></a>";
+            else
+                echo "<a class=\"btn btn-primary btn-sm\" href=\"/records/payee/index.php?action=edit&id={$row['Id']}\" role=\"button\"><i class=\"bi bi-pencil-square\"></i></a>";
+
+            echo "</div>";
+            echo "</td>\n";
+            echo "\t\t\t</tr>\n";
+        }
+
+        echo "\t\t</tbody>\n";
+        echo "\t</table>\n";
+        echo "</div>\n";
+    }
+    else
+    {
+        echo "<div class=\"alert alert-warning\" role=\"alert\">\n";
+        echo "\t<h4 class=\"alert-heading\">Nessun Elemento</h4>\n";
+        echo "\t<p>Non è stato trovato nessun elemento!</p>\n";
+        echo "</div>";
+    }
+}
+else
+{
+    echo "<div class=\"alert alert-danger\" role=\"alert\">\n";
+    echo "\t<h4 class=\"alert-heading\">Database Error</h4>\n";
+    echo "\t<p>Errore: Il database non risponde.</p>\n";
+    echo "</div>";
+}
+?>
+</div>
