@@ -1,6 +1,6 @@
 <?php
 /*
- * PlutoTool 
+ * This file is part of PlutoTool Project
  * Copyright (C) 2022 Marco Giammarini
  *
  * Author(s):

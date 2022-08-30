@@ -1,34 +1,54 @@
 <?php
-    $displayType = ($type == "view") ? "disabled" : "";
-    $isError = FALSE;
-    $rows = NULL;
+/*
+ * This file is part of PlutoTool Project
+ * Copyright (C) 2022 Marco Giammarini
+ *
+ * Author(s):
+ *  Marco Giammarini <m.giammarini@warcomeb.it>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>
+ */
+$displayType = ($type == "view") ? "disabled" : "";
+$isError = FALSE;
+$rows = NULL;
 
-    if (($type == "view") || ($type == "edit"))
+if (($type == "view") || ($type == "edit"))
+{
+    $query = "SELECT P.Id, P.Name, P.Email, P.Phone, P.Address, P.City, P.District, " .
+    "P.ZipCode, P.Country, P.VATID, P.NIN, P.Active, P.Note, " .
+    "T.Id AS TypeId, T.Name AS TypeName " .
+    "FROM " . PRJ_DB_TABLE_PAYEE . " P " .
+    "JOIN " . PRJ_DB_TABLE_PAYEE_TYPE . " T ON P.PayeeTypeId=T.Id " . 
+    "WHERE P.Id={$_GET['id']}";
+
+    $result = $db->query($query);
+    if ($result)
     {
-        $query = "SELECT P.Id, P.Name, P.Email, P.Phone, P.Address, P.City, P.District, " .
-        "P.ZipCode, P.Country, P.VATID, P.NIN, P.Active, P.Note, " .
-        "T.Id AS TypeId, T.Name AS TypeName " .
-        "FROM " . PRJ_DB_TABLE_PAYEE . " P " .
-        "JOIN " . PRJ_DB_TABLE_PAYEE_TYPE . " T ON P.PayeeTypeId=T.Id " . 
-        "WHERE P.Id={$_GET['id']}";
-
-        $result = $db->query($query);
-        if ($result)
-        {
-            $rows = $result->fetchAll(PDO::FETCH_ASSOC);
-            if ((count($rows) == 0) || (count($rows) > 1))
-            {
-                $isError = TRUE;
-            }
-        }
-        else
+        $rows = $result->fetchAll(PDO::FETCH_ASSOC);
+        if ((count($rows) == 0) || (count($rows) > 1))
         {
             $isError = TRUE;
         }
     }
-
-    if ($isError == FALSE)
+    else
     {
+        $isError = TRUE;
+    }
+}
+
+if ($isError == FALSE)
+{
 ?>
 <div class="container-fluid">
 
@@ -112,34 +132,34 @@
                     <label for="payee-form-ptype">Tipo</label>
                     <div class="btn-group-toggle" data-toggle="buttons">
 <?php
-if ($type === "view")
-{
-    echo "<input type=\"text\" class=\"form-control\" id=\"payee-form-ptype\" placeholder=\"{$rows[0]['TypeName']}\" disabled>";
-}
-else
-{
-    $query = "SELECT * FROM " . PRJ_DB_TABLE_PAYEE_TYPE . " ORDER BY Name";
-
-    $typeid = (isset($rows[0]['TypeId']) ? $rows[0]['TypeId'] : 0);
-    $result = $db->query($query);
-    if ($result)
+    if ($type === "view")
     {
-        $rowsPayee = $result->fetchAll(PDO::FETCH_ASSOC);
-        if ($rowsPayee)
+        echo "<input type=\"text\" class=\"form-control\" id=\"payee-form-ptype\" placeholder=\"{$rows[0]['TypeName']}\" disabled>";
+    }
+    else
+    {
+        $query = "SELECT * FROM " . PRJ_DB_TABLE_PAYEE_TYPE . " ORDER BY Name";
+
+        $typeid = (isset($rows[0]['TypeId']) ? $rows[0]['TypeId'] : 0);
+        $result = $db->query($query);
+        if ($result)
         {
-            echo "<select id=\"payee-form-ptype\" class=\"form-control selectpicker\">\n";
-            foreach ($rowsPayee as $rowPayee)
+            $rowsPayee = $result->fetchAll(PDO::FETCH_ASSOC);
+            if ($rowsPayee)
             {
-                $selected = "";
-                if ($rowPayee['Id'] === $typeid) $selected = "selected";
-                else $selected = "";
-             
-                echo "<option value=\"{$rowPayee['Id']}\" {$selected}>{$rowPayee['Name']}</option>\n";
+                echo "<select id=\"payee-form-ptype\" class=\"form-control selectpicker\">\n";
+                foreach ($rowsPayee as $rowPayee)
+                {
+                    $selected = "";
+                    if ($rowPayee['Id'] === $typeid) $selected = "selected";
+                    else $selected = "";
+                
+                    echo "<option value=\"{$rowPayee['Id']}\" {$selected}>{$rowPayee['Name']}</option>\n";
+                }
+                echo "</select>\n";
             }
-            echo "</select>\n";
-        }
-    }                            
-}
+        }                            
+    }
 ?>         
                     </div>
                 </div>
@@ -152,8 +172,8 @@ else
                 </div>
 
 <?php 
-if ($type != "view")
-{
+    if ($type != "view")
+    {
 ?>
                 <div class="form-group">
                     <button class="btn btn-primary"  onclick="save_payee()" id="payee-form-save">Save</button>
@@ -175,7 +195,7 @@ if ($type != "view")
                     &nbsp; <span>Loading...</span>
                 </div>
 <?php
-}
+    }
 ?>
             </form>
         </div>
@@ -183,9 +203,9 @@ if ($type != "view")
 </div>
 
 <?php
-    }
-    else
-    {
-        // TODO
-    }
+}
+else
+{
+    // TODO
+}
 ?>
