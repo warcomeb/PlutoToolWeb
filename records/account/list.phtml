@@ -1,0 +1,97 @@
+<div class="container-fluid">
+
+<!-- Page Heading -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Portafogli</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group mr-2">
+            <a class="btn btn-sm btn-outline-primary" href="/records/account/index.php?action=add" role="button"><i class="bi bi-plus-square"></i>&nbsp;Aggiungi</a>
+        </div>
+    </div>
+</div> 
+<?php
+
+// Get the user list
+$query = "SELECT A.Id, A.Name, A.Number, A.Active, A.Note, " .
+         "T.Name as TypeName, " .
+         "U.Name as OwnerName, U.Surname as OwnerSurname " .
+         "FROM " . PRJ_DB_TABLE_ACCOUNT . " A " .
+         "JOIN " . PRJ_DB_TABLE_ACCOUNT_TYPE . " T ON A.AccountTypeId=T.Id " .
+         "JOIN " . PRJ_DB_TABLE_USER . " U ON A.OwnerUserId=U.Id " .
+         "ORDER BY A.Name";
+
+$result = $db->query($query);
+if ($result)
+{
+    $rows = $result->fetchAll(PDO::FETCH_ASSOC);
+    if ($rows)
+    {
+        echo "<div class=\"table-responsive\">\n";
+        echo "\t<table id=\"payee-list-table\" class=\"table table-striped table-bordered\" style=\"width:100%\">\n";
+        echo "\t\t<thead>\n";
+        echo "\t\t\t<tr>\n";
+        echo "\t\t\t\t<th>Id</th>\n";
+        echo "\t\t\t\t<th>Nome</th>\n";
+        echo "\t\t\t\t<th>Tipo</th>\n";
+        echo "\t\t\t\t<th>Proprietario</th>\n";
+        echo "\t\t\t\t<th>Attivo</th>\n";
+        echo "\t\t\t\t<th>&nbsp;</th>\n";
+        echo "\t\t\t</tr>\n";
+        echo "\t\t</thead>\n";
+        echo "\t\t<tbody>\n";
+
+        // Scan the DB elements
+        foreach ($rows as $row)
+        {
+            echo "\t\t\t<tr>\n";
+            // Print Pluto-ID
+            echo "\t\t\t\t<td>{$row['Id']}</td>\n";
+            // Print account name with type icon.
+            echo "\t\t\t\t<td>{$row['Name']}</td>\n";
+            echo "\t\t\t\t<td>{$row['TypeName']}</td>\n";
+            echo "\t\t\t\t<td>{$row['OwnerSurname']} {$row['OwnerName']}</td>\n";
+            if ($row['Active'] == 1)
+            {            
+                echo "\t\t\t\t<td>".
+                     "<button type=\"button\" class=\"btn btn-outline-success btn-sm\"><i class=\"bi bi-file-earmark-check\"></i></button>".
+                     "</td>\n";
+            }
+            else
+            {
+                echo "\t\t\t\t<td>".
+                     "<button type=\"button\" class=\"btn btn-outline-danger btn-sm\"><i class=\"bi bi-file-earmark-excel\"></i></button>".
+                     "</td>\n";
+            }
+
+            // Print command buttons... delete is not usable
+            echo "\t\t\t\t<td>";
+            echo "<div class=\"btn-group\" role=\"group\" aria-label=\"Commands\">";
+            echo "<a class=\"btn btn-primary btn-sm\" href=\"/records/account/index.php?action=view&id={$row['Id']}\" role=\"button\"><i class=\"bi bi-eye\"></i></a>";
+            echo "<a class=\"btn btn-primary btn-sm\" href=\"/records/account/index.php?action=edit&id={$row['Id']}\" role=\"button\"><i class=\"bi bi-pencil-square\"></i></a>";
+
+            echo "</div>";
+            echo "</td>\n";
+            echo "\t\t\t</tr>\n";
+        }
+
+        echo "\t\t</tbody>\n";
+        echo "\t</table>\n";
+        echo "</div>\n";
+    }
+    else
+    {
+        echo "<div class=\"alert alert-warning\" role=\"alert\">\n";
+        echo "\t<h4 class=\"alert-heading\">Nessun Elemento</h4>\n";
+        echo "\t<p>Non è stato trovato nessun elemento!</p>\n";
+        echo "</div>";
+    }
+}
+else
+{
+    echo "<div class=\"alert alert-danger\" role=\"alert\">\n";
+    echo "\t<h4 class=\"alert-heading\">Database Error</h4>\n";
+    echo "\t<p>Errore: Il database non risponde.</p>\n";
+    echo "</div>";
+}
+?>
+</div>

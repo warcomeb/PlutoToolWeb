@@ -1,0 +1,225 @@
+<?php
+/*
+ * This file is part of PlutoTool Project
+ * Copyright (C) 2022 Marco Giammarini
+ *
+ * Author(s):
+ *  Marco Giammarini <m.giammarini@warcomeb.it>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>
+ */
+$displayType = ($type == "view") ? "disabled" : "";
+$isError = FALSE;
+$rows = NULL;
+
+if (($type == "view") || ($type == "edit"))
+{
+    $query = "SELECT A.Id, A.Name, A.Number, A.Active, A.Note, " .
+             "T.Name as TypeName, " .
+             "U.Name as OwnerName, U.Surname as OwnerSurname, U.Id as OwnerId " .
+             "FROM " . PRJ_DB_TABLE_ACCOUNT . " A " .
+             "JOIN " . PRJ_DB_TABLE_ACCOUNT_TYPE . " T ON A.AccountTypeId=T.Id " .
+             "JOIN " . PRJ_DB_TABLE_USER . " U ON A.OwnerUserId=U.Id " .
+             "WHERE A.Id={$_GET['id']}";
+
+    $result = $db->query($query);
+    if ($result)
+    {
+        $rows = $result->fetchAll(PDO::FETCH_ASSOC);
+        if ((count($rows) == 0) || (count($rows) > 1))
+        {
+            $isError = TRUE;
+        }
+    }
+    else
+    {
+        $isError = TRUE;
+    }
+}
+
+if ($isError == FALSE)
+{
+?>
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2" id="account-page-title">
+            <?php  
+                if      ($type == "view") echo "Visualizza Portafoglio";
+                else if ($type == "add")  echo "Nuovo Portafoglio";
+                else if ($type == "edit") echo "Modifica Portafoglio";
+            ?>
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+                <a class="btn btn-sm btn-outline-primary" href="/records/account/index.php" role="button"><i class="bi bi-arrow-left-square"></i>&nbsp;Indietro</a>
+            </div>
+        </div>
+    </div> 
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <form id="account-form" class="row g-3" data-parsley-validate="">
+                <input type="hidden" id="account-form-type" value="<?php echo $type ?>" />
+
+                <div class="form-group col-md-2">
+                    <label for="account-form-id">Id</label>
+                    <input type="text" class="form-control" id="account-form-id" placeholder="" value="<?php echo (isset($rows[0]['Id'])) ? $rows[0]['Id'] : "0"; ?>" disabled>
+                </div>
+                <div class="form-group col-md-10">
+                    <label for="account-form-name">Nome</label>
+                    <input type="text" class="form-control" id="account-form-name" placeholder="" data-parsley-minlength="3" autocomplete="off" required value="<?php echo (isset($rows[0]['Name'])) ? $rows[0]['Name'] : ""; ?>" <?php echo $displayType; ?>>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="account-form-number">Numero</label>
+                    <input type="text" class="form-control" id="account-form-number" placeholder="" data-parsley-minlength="5" value="<?php echo (isset($rows[0]['Number'])) ? $rows[0]['Number'] : ""; ?>" <?php echo $displayType; ?>>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="account-form-user">Proprietario</label>
+<?php
+    if ($type === "view")
+    {
+        echo "<input type=\"text\" class=\"form-control\" id=\"account-form-user\" placeholder=\"{$rows[0]['OwnerSurname']} {$rows[0]['OwnerName']}\" disabled>";
+    }
+    else
+    {
+        $query = "SELECT * FROM " . PRJ_DB_TABLE_USER . " ORDER BY Surname";
+
+        $typeid = (isset($rows[0]['OwnerId']) ? $rows[0]['OwnerId'] : 0);
+        $result = $db->query($query);
+        if ($result)
+        {
+            $rowsUser = $result->fetchAll(PDO::FETCH_ASSOC);
+            if ($rowsUser)
+            {
+                echo "<select id=\"account-form-user\" class=\"form-control selectpicker\">\n";
+                foreach ($rowsUser as $rowUser)
+                {
+                    $selected = "";
+                    if ($rowUser['Id'] === $typeid) $selected = "selected";
+                    else $selected = "";
+                
+                    echo "<option value=\"{$rowUser['Id']}\" {$selected}>{$rowUser['Surname']} {$rowUser['Name']}</option>\n";
+                }
+                echo "</select>\n";
+            }
+        }
+    }
+?> 
+                </div>                
+
+                <div class="form-group col-md-1">
+                    <label for="account-form-status">Status</label>
+                    <div class="btn-group-toggle"  data-toggle="buttons">
+<?php
+if ($type == "view")
+{
+    echo "<input class=\"btn-check\" type=\"checkbox\" autocomplete=\"off\" id=\"account-form-status\" disabled " . (($rows[0]['Active'] == 1) ? "checked" : "") . ">\n\t" .
+         "<label class=\"btn btn-primary\">Attivo</label>\n";
+}
+else if ($type == "add")
+{
+    echo "<input class=\"btn-check\" type=\"checkbox\" autocomplete=\"off\" id=\"account-form-status\" disabled checked>\n\t" .
+         "<label class=\"btn btn-primary\">Attivo</label>\n";
+}
+else // Edit
+{
+    echo "<input class=\"btn-check\" type=\"checkbox\" autocomplete=\"off\" id=\"account-form-status\" " . (($rows[0]['Active'] == 1) ? "checked" : "") . ">\n\t" .
+         "<label class=\"btn btn-outline-primary\" for=\"account-form-status\">Attivo</label>\n";
+}
+?>
+                    </div>
+                </div>
+
+                <div class="form-group col-md-11">
+                    <label for="account-form-atype">Tipo</label>
+                    <div class="btn-group-toggle" data-toggle="buttons">
+<?php
+    if ($type === "view")
+    {
+        echo "<input type=\"text\" class=\"form-control\" id=\"account-form-atype\" placeholder=\"{$rows[0]['TypeName']}\" disabled>";
+    }
+    else
+    {
+        $query = "SELECT * FROM " . PRJ_DB_TABLE_ACCOUNT_TYPE . " ORDER BY Name";
+
+        $typeid = (isset($rows[0]['TypeId']) ? $rows[0]['TypeId'] : 0);
+        $result = $db->query($query);
+        if ($result)
+        {
+            $rowsAccountType = $result->fetchAll(PDO::FETCH_ASSOC);
+            if ($rowsAccountType)
+            {
+                echo "<select id=\"account-form-atype\" class=\"form-control selectpicker\">\n";
+                foreach ($rowsAccountType as $rowAccountType)
+                {
+                    $selected = "";
+                    if ($rowAccountType['Id'] === $typeid) $selected = "selected";
+                    else $selected = "";
+                
+                    echo "<option value=\"{$rowAccountType['Id']}\" {$selected}>{$rowAccountType['Name']}</option>\n";
+                }
+                echo "</select>\n";
+            }
+        }                            
+    }
+?>         
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="account-form-note">Note</label>
+                    <textarea class="form-control" id="account-form-note" rows="3" placeholder="" <?php echo $displayType; ?>><?php echo (isset($rows[0]['Note']) ? $rows[0]['Note'] : ""); ?></textarea>
+                </div>
+
+<?php 
+    if ($type != "view")
+    {
+?>
+                <div class="form-group">
+                    <button class="btn btn-primary"  onclick="save_account()" id="account-form-save">Save</button>
+                    <button class="btn btn-primary" type="reset" id="account-form-reset">Reset</button>
+                </div>
+
+                <div class="alert alert-success d-none" role="alert" id="account-form-success">
+                    &nbsp;
+                </div>
+                                
+                <div class="alert alert-danger d-none" role="alert" id="account-form-error">
+                    &nbsp;
+                </div>
+                                
+                <div class="alert alert-primary d-none" role="alert" id="account-form-loading">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <!-- <span class="visually-hidden">Loading...</span> -->
+                    </div>
+                    &nbsp; <span>Loading...</span>
+                </div>
+<?php
+    }
+?>
+            </form>
+        </div>
+    </div>
+</div>
+
+<?php
+}
+else
+{
+    // TODO
+}
+?>

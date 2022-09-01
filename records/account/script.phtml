@@ -1,0 +1,83 @@
+<script>
+function save_account()
+{
+    var formData = 
+    {
+        'id'                : $('#account-form-id').val(),
+        'action'            : $('#account-form-type').val(),
+        'name'              : $('#account-form-name').val(),
+        'number'            : $('#account-form-number').val(),
+        'type'              : $('#account-form-atype').val(),
+        'owner'             : $('#account-form-user').val(),
+        'active'            : ($('#account-form-status').is(":checked")) ? 1 : 0,
+        'note'              : $('#account-form-note').val(),
+    };
+
+    // Disable buttons
+    $('#account-form-save').attr("disabled","disabled");
+    $('#account-form-reset').attr("disabled","disabled");
+    // Show loading gift
+    $('#account-form-loading').removeClass('d-none').delay(800);
+
+    $.ajax({
+        type        : 'POST',
+        url         : '/records/account/form.php',
+        data        : formData, 
+        dataType    : 'json',
+        encode      : true,
+        success: function(data){ 
+            console.log(data)
+            console.log(data['query'])
+
+            if (typeof data['id'] !== 'undefined')
+            {
+                // Valid account saved!
+                if (0 !== data['id'])
+                {
+                    // Show success message
+                    $('#account-form-loading').addClass('d-none');
+                    $('#account-form-error').addClass('d-none');
+
+                    // TODO: write success message
+                    $('#account-form-success').html('<i class="bi bi-check-square-fill"></i>');
+                    if ("edit" === $('#account-form-type').val())
+                    {
+                        $('#account-form-success').append(' Modifica effettuata con successo!');
+                    }
+                    else if ("add" === $('#account-form-type').val())
+                    {
+                        $('#account-form-success').append(' Salvataggio effettuato con successo!');
+                    }
+                    $('#account-form-success').removeClass('d-none').delay(1000);
+
+                    // Redirect to view page...
+                    $(location).attr('href', '/records/account/index.php?action=view&id=' + data['id']);
+                }
+            }
+            else
+            {
+                // ERROR!!
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log("ERROR: #account-form ajax fail with " + errorThrown);
+            //console.log(XMLHttpRequest.statusText);
+            //console.log(textStatus);   
+
+            // FIXME: manage better the error type!
+            // Write text into error div message
+            $('#account-form-error').html('<i class="bi bi-exclamation-square-fill"></i>');
+            $('#account-form-error').append(' ERR[' + XMLHttpRequest.status + '] ' + XMLHttpRequest.statusText);
+
+            // Show error message
+            $('#account-form-loading').addClass('d-none');
+            $('#account-form-success').addClass('d-none');
+            $('#account-form-error').removeClass('d-none').delay(1000);
+
+            // Enable buttons
+            $('#account-form-save').removeAttr("disabled");
+            $('#account-form-reset').removeAttr("disabled");
+        }  
+    })
+}
+</script>

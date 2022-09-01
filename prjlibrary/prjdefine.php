@@ -28,23 +28,14 @@ define("PRJ_YEAR"                   , "2022");
 // Database Table's name
 define("PRJ_DB_TABLE_USER"          , "user");
 define("PRJ_DB_TABLE_SESSION"       , "usersession");
-// define("PRJ_DB_TABLE_ACCOUNT"       , "account");
-// define("PRJ_DB_TABLE_ACCOUNT_TYPE"  , "accounttype");
+define("PRJ_DB_TABLE_ACCOUNT"       , "account");
+define("PRJ_DB_TABLE_ACCOUNT_TYPE"  , "accounttype");
 define("PRJ_DB_TABLE_PAYEE"         , "payee");
 define("PRJ_DB_TABLE_PAYEE_TYPE"    , "payeetype");
 // define("PRJ_DB_TABLE_WORKORDER"     , "workorder");
 // define("PRJ_DB_TABLE_CATEGORY"      , "category");
 // define("PRJ_DB_TABLE_SUBCATEGORY"   , "subcategory");
 // define("PRJ_DB_TABLE_TRANSACTION"   , "transaction");
-
-// Code start char
-define("PRJ_CODE_USER"              , "U");
-define("PRJ_CODE_ACCOUNT"           , "A");
-define("PRJ_CODE_PAYEE"             , "P");
-define("PRJ_CODE_WORKORDER"         , "W");
-
-// Element code length
-define("PRJ_CODE_LENGTH"            , 5);
 
 // Category types
 define("PRJ_CATEGORY_TYPE_INPUT"    , "i");

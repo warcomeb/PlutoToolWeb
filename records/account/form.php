@@ -52,25 +52,18 @@ list($status, $user) = Login::isLogged($db);
         // Write the query
         // FIXME: timestamp is usefull?
         // FIXME: Log, is usefull?
-        $query = "INSERT INTO " . PRJ_DB_TABLE_PAYEE . " 
-                (Id, Name, PayeeTypeId, Email, Phone, Address, City, District, ZipCode, Country, VATID, NIN, Active, Note) 
+        $query = "INSERT INTO " . PRJ_DB_TABLE_ACCOUNT . " 
+                (Id, Name, Number, AccountTypeId, OwnerUserId, Active, Note) 
                 VALUES (NULL, 
                 '" . addslashes(stripslashes($_POST['name'])) . "',
-                '" . addslashes(stripslashes($_POST['type'])) . "',
-                '" . addslashes(stripslashes($_POST['email'])) . "', 
-                '" . addslashes(stripslashes($_POST['phone'])) . "', 
-                '" . addslashes(stripslashes($_POST['address'])) . "',
-                '" . addslashes(stripslashes($_POST['city'])) . "',
-                '" . addslashes(stripslashes($_POST['district'])) . "',
-                '" . addslashes(stripslashes($_POST['zip'])) . "',
-                '" . addslashes(stripslashes($_POST['country'])) . "',
-                '" . addslashes(stripslashes($_POST['vat'])) . "',
-                '" . addslashes(stripslashes($_POST['nin'])) . "',
+                '" . addslashes(stripslashes($_POST['number'])) . "',
+                '" . addslashes(stripslashes($_POST['type'])) . "', 
+                '" . addslashes(stripslashes($_POST['owner'])) . "', 
                 '1',
                 '" . addslashes(stripslashes($_POST['note'])) . "')";
         // run query
-        //$data['query'] = $query;
-        //$affectedRows = $db->exec($query);
+        $data['query'] = $query;
+        $affectedRows = $db->exec($query);
         if ($affectedRows === 1)
         {
             $data['id'] = $db->lastInsertId();
@@ -79,7 +72,7 @@ list($status, $user) = Login::isLogged($db);
         else
         {
             $data['status'] = 1;
-            $data['error'] = MyError::getErrorMessage(MyError::_Payee_ErrorAddingNew);
+            $data['error'] = MyError::getErrorMessage(MyError::_Account_ErrorAddingNew);
         }
     }
     else if ($_POST['action'] == "edit")
@@ -87,23 +80,16 @@ list($status, $user) = Login::isLogged($db);
         // Write the query
         // FIXME: timestamp is usefull?
         // FIXME: Log, is usefull?
-        $query = "UPDATE " . PRJ_DB_TABLE_PAYEE . " SET
+        $query = "UPDATE " . PRJ_DB_TABLE_ACCOUNT . " SET
                  Name = '" . addslashes(stripslashes($_POST['name'])) . "', 
-                 PayeeTypeId = '" . addslashes(stripslashes($_POST['type'])) . "', 
-                 Email = '" . addslashes(stripslashes($_POST['email'])) . "', 
-                 Phone = '" . addslashes(stripslashes($_POST['phone'])) . "', 
-                 Address = '" . addslashes(stripslashes($_POST['address'])) . "', 
-                 City = '" . addslashes(stripslashes($_POST['city'])) . "', 
-                 District = '" . addslashes(stripslashes($_POST['district'])) . "', 
-                 ZipCode = '" . addslashes(stripslashes($_POST['zip'])) . "', 
-                 Country = '" . addslashes(stripslashes($_POST['country'])) . "', 
-                 VATID = '" . addslashes(stripslashes($_POST['vat'])) . "', 
-                 NIN = '" . addslashes(stripslashes($_POST['nin'])) . "', 
+                 Number = '" . addslashes(stripslashes($_POST['number'])) . "', 
+                 AccountTypeId = '" . addslashes(stripslashes($_POST['type'])) . "', 
+                 OwnerUserId = '" . addslashes(stripslashes($_POST['owner'])) . "', 
+                 Active = '" . addslashes(stripslashes($_POST['active'])) . "', 
                  Note = '" . addslashes(stripslashes($_POST['note'])) . "' 
                  WHERE Id = {$_POST['id']}";
         $data['query'] = $query;
-        // $affectedRows = $db->exec($query);
-        $affectedRows = 0;
+        $affectedRows = $db->exec($query);
         if ($affectedRows === 1)
         {
             $data['id'] = $_POST['id'];
@@ -112,7 +98,7 @@ list($status, $user) = Login::isLogged($db);
         else
         {
             $data['status'] = 1;
-            $data['error'] = MyError::getErrorMessage(MyError::_Payee_ErrorEdit);
+            $data['error'] = MyError::getErrorMessage(MyError::_Account_ErrorEdit);
         }
     }
 // }
