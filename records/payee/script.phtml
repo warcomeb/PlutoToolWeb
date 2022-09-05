@@ -36,27 +36,35 @@ function save_payee()
             console.log(data)
             console.log(data['query'])
 
-            // Valid payee saved!
+            // Valid workorder saved!
             if (0 !== data['id'])
             {
-                // Show success message
-                $('#payee-form-loading').addClass('d-none');
-                $('#payee-form-error').addClass('d-none');
-
-                // TODO: write success message
-                $('#payee-form-success').html('<i class="bi bi-check-square-fill"></i>');
-                if ("edit" === $('#payee-form-type').val())
+            // Valid payee saved!
+                if (0 !== data['id'])
                 {
-                    $('#payee-form-success').append(' Modifica effettuata con successo!');
-                }
-                else if ("add" === $('#payee-form-type').val())
-                {
-                    $('#payee-form-success').append(' Salvataggio effettuato con successo!');
-                }
-                $('#payee-form-success').removeClass('d-none').delay(1000);
+                    // Show success message
+                    $('#payee-form-loading').addClass('d-none');
+                    $('#payee-form-error').addClass('d-none');
 
-                // Redirect to table page...
-                $(location).attr('href', '/records/payee/index.php?action=view&id=' + data['id']);
+                    // TODO: write success message
+                    $('#payee-form-success').html('<i class="bi bi-check-square-fill"></i>');
+                    if ("edit" === $('#payee-form-type').val())
+                    {
+                        $('#payee-form-success').append(' Modifica effettuata con successo!');
+                    }
+                    else if ("add" === $('#payee-form-type').val())
+                    {
+                        $('#payee-form-success').append(' Salvataggio effettuato con successo!');
+                    }
+                    $('#payee-form-success').removeClass('d-none').delay(1000);
+
+                    // Redirect to table page...
+                    $(location).attr('href', '/records/payee/index.php?action=view&id=' + data['id']);
+                }
+            }
+            else
+            {
+                // ERROR!!
             }
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {

@@ -1,0 +1,155 @@
+<?php
+/*
+ * This file is part of PlutoTool Project
+ * Copyright (C) 2022 Marco Giammarini
+ *
+ * Author(s):
+ *  Marco Giammarini <m.giammarini@warcomeb.it>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>
+ */
+$displayType = ($type == "view") ? "disabled" : "";
+$isError = FALSE;
+$rows = NULL;
+
+if (($type == "view") || ($type == "edit"))
+{
+    $query = "SELECT * " .
+             "FROM " . PRJ_DB_TABLE_WORKORDER . " " .
+             "WHERE Id={$_GET['id']}";
+
+    $result = $db->query($query);
+    if ($result)
+    {
+        $rows = $result->fetchAll(PDO::FETCH_ASSOC);
+        if ((count($rows) == 0) || (count($rows) > 1))
+        {
+            $isError = TRUE;
+        }
+    }
+    else
+    {
+        $isError = TRUE;
+    }
+}
+
+if ($isError == FALSE)
+{
+?>
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2" id="workorder-page-title">
+            <?php  
+                if      ($type == "view") echo "Visualizza Commessa";
+                else if ($type == "add")  echo "Nuovo Commessa";
+                else if ($type == "edit") echo "Modifica Commessa";
+            ?>
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+                <a class="btn btn-sm btn-outline-primary" href="/records/workorder/index.php" role="button"><i class="bi bi-arrow-left-square"></i>&nbsp;Indietro</a>
+            </div>
+        </div>
+    </div> 
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <form id="workorder-form" class="row g-3" data-parsley-validate="">
+                <input type="hidden" id="workorder-form-type" value="<?php echo $type ?>" />
+
+                <div class="form-group col-md-2">
+                    <label for="workorder-form-id">Id</label>
+                    <input type="text" class="form-control" id="workorder-form-id" placeholder="" value="<?php echo (isset($rows[0]['Id'])) ? $rows[0]['Id'] : "0"; ?>" disabled>
+                </div>
+                <div class="form-group col-md-10">
+                    <label for="workorder-form-name">Nome</label>
+                    <input type="text" class="form-control" id="workorder-form-name" placeholder="" data-parsley-minlength="3" autocomplete="off" required value="<?php echo (isset($rows[0]['Name'])) ? $rows[0]['Name'] : ""; ?>" <?php echo $displayType; ?>>
+                </div>
+
+                <div class="form-group col-md-12">
+                    <label for="workorder-form-desc">Descrizione</label>
+                    <input type="text" class="form-control" id="workorder-form-desc" placeholder="" data-parsley-minlength="3" autocomplete="off" value="<?php echo (isset($rows[0]['Description'])) ? $rows[0]['Description'] : ""; ?>" <?php echo $displayType; ?>>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="workorder-form-start">Inizio</label>
+                        <div class="input-group date" id="workorder-form-start1" data-target-input="nearest">                        	
+                            <input type="text" class="form-control datetimepicker-input" data-target="#workorder-form-start1" id="workorder-form-start" value="<?php echo (isset($rows[0]['StartDate'])) ? date("d/m/Y", strtotime($rows[0]['StartDate'])) : ""; ?>" data-parsley-mydate="" data-parsley-errors-container="#parsley-datetimepicker-error1" required  <?php echo $displayType; ?>/>
+                            <div class="input-group-append" data-target="#workorder-form-start1" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="bi bi-calendar2"></i></div>
+                            </div>
+                        </div>
+                    <input type="hidden" id="workorder-form-start2" value="<?php echo (isset($rows[0]['StartDate'])) ? date("d/m/Y", strtotime($rows[0]['StartDate'])) : ""; ?>" />
+                    <div id="parsley-datetimepicker-error1">
+                    </div>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="workorder-form-stop">Fine</label>
+                    <div class="input-group date" id="workorder-form-stop1" data-target-input="nearest">                        	
+                        <input type="text" class="form-control datetimepicker-input" data-target="#workorder-form-stop1" id="workorder-form-stop" value="<?php echo (isset($rows[0]['EndDate'])) ? date("d/m/Y", strtotime($rows[0]['EndDate'])) : ""; ?>" data-parsley-mydate="" data-parsley-errors-container="#parsley-datetimepicker-error2" required <?php echo $displayType; ?>/>
+                        <div class="input-group-append" data-target="#workorder-form-stop1" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="bi bi-calendar2"></i></div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="workorder-form-stop2" value="<?php echo (isset($rows[0]['EndDate'])) ? date("d/m/Y", strtotime($rows[0]['EndDate'])) : ""; ?>" />
+                    <div id="parsley-datetimepicker-error2">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="workorder-form-note">Note</label>
+                    <textarea class="form-control" id="workorder-form-note" rows="3" placeholder="" <?php echo $displayType; ?>><?php echo (isset($rows[0]['Note']) ? $rows[0]['Note'] : ""); ?></textarea>
+                </div>
+
+<?php 
+    if ($type != "view")
+    {
+?>
+                <div class="form-group">
+                    <button class="btn btn-primary"  onclick="save_workorder()" id="workorder-form-save">Save</button>
+                    <button class="btn btn-primary" type="reset" id="workorder-form-reset">Reset</button>
+                </div>
+
+                <div class="alert alert-success d-none" role="alert" id="workorder-form-success">
+                    &nbsp;
+                </div>
+                                
+                <div class="alert alert-danger d-none" role="alert" id="workorder-form-error">
+                    &nbsp;
+                </div>
+                                
+                <div class="alert alert-primary d-none" role="alert" id="workorder-form-loading">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <!-- <span class="visually-hidden">Loading...</span> -->
+                    </div>
+                    &nbsp; <span>Loading...</span>
+                </div>
+<?php
+    }
+?>
+            </form>
+        </div>
+    </div>
+</div>
+
+<?php
+}
+else
+{
+    // TODO
+}
+?>

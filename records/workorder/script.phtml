@@ -1,0 +1,116 @@
+<script type="text/javascript">
+
+const pickerStart = new tempusDominus.TempusDominus(document.getElementById('workorder-form-start1'), {
+  //put your config here
+    display: {
+        components: {
+            decades: false,
+            year: true,
+            month: true,
+            date: true,
+            hours: false,
+            minutes: false,
+            seconds: false,
+        },
+        theme: 'light'
+    }
+});
+
+const pickerEnd = new tempusDominus.TempusDominus(document.getElementById('workorder-form-stop1'), {
+  //put your config here
+    display: {
+        components: {
+            decades: false,
+            year: true,
+            month: true,
+            date: true,
+            hours: false,
+            minutes: false,
+            seconds: false,
+        },
+        theme: 'light'
+    }
+});
+
+function save_workorder()
+{
+    var formData = 
+    {
+        'id'                : $('#workorder-form-id').val(),
+        'action'            : $('#workorder-form-type').val(),
+        'name'              : $('#workorder-form-name').val(),
+        'description'       : $('#workorder-form-desc').val(),
+        'start'             : $('#workorder-form-start').val(),
+        'end'               : $('#workorder-form-stop').val(),
+        'note'              : $('#workorder-form-note').val(),
+    };
+
+    // Disable buttons
+    $('#workorder-form-save').attr("disabled","disabled");
+    $('#workorder-form-reset').attr("disabled","disabled");
+    // Show loading gift
+    $('#workorder-form-loading').removeClass('d-none').delay(800);
+
+
+    $.ajax({
+        type        : 'POST',
+        url         : '/records/workorder/form.php',
+        data        : formData, 
+        dataType    : 'json',
+        encode      : true,
+        success: function(data){ 
+            console.log(data)
+            console.log(data['query'])
+
+            if (typeof data['id'] !== 'undefined')
+            {
+                // Valid workorder saved!
+                if (0 !== data['id'])
+                {
+                    // Show success message
+                    $('#workorder-form-loading').addClass('d-none');
+                    $('#workorder-form-error').addClass('d-none');
+
+                    // TODO: write success message
+                    $('#workorder-form-success').html('<i class="bi bi-check-square-fill"></i>');
+                    if ("edit" === $('#workorder-form-type').val())
+                    {
+                        $('#workorder-form-success').append(' Modifica effettuata con successo!');
+                    }
+                    else if ("add" === $('#workorder-form-type').val())
+                    {
+                        $('#workorder-form-success').append(' Salvataggio effettuato con successo!');
+                    }
+                    $('#workorder-form-success').removeClass('d-none').delay(1000);
+
+                    // Redirect to table page...
+                    $(location).attr('href', '/records/workorder/index.php?action=view&id=' + data['id']);
+                }
+            }
+            else
+            {
+                // ERROR!!
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log("ERROR: #workorder-form ajax fail with " + errorThrown);
+            //console.log(XMLHttpRequest.statusText);
+            //console.log(textStatus);   
+
+            // FIXME: manage better the error type!
+            // Write text into error div message
+            $('#workorder-form-error').html('<i class="bi bi-exclamation-square-fill"></i>');
+            $('#workorder-form-error').append(' ERR[' + XMLHttpRequest.status + '] ' + XMLHttpRequest.statusText);
+
+            // Show error message
+            $('#workorder-form-loading').addClass('d-none');
+            $('#workorder-form-success').addClass('d-none');
+            $('#workorder-form-error').removeClass('d-none').delay(1000);
+
+            // Enable buttons
+            $('#workorder-form-save').removeAttr("disabled");
+            $('#workorder-form-reset').removeAttr("disabled");
+        }  
+    })
+}
+</script>
