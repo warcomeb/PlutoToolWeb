@@ -26,7 +26,7 @@ $rows = NULL;
 if (($type == "view") || ($type == "edit"))
 {
     $query = "SELECT A.Id, A.Name, A.Number, A.Active, A.Note, " .
-             "T.Name as TypeName, " .
+             "T.Name as TypeName, T.Id as TypeId, " .
              "U.Name as OwnerName, U.Surname as OwnerSurname, U.Id as OwnerId " .
              "FROM " . PRJ_DB_TABLE_ACCOUNT . " A " .
              "JOIN " . PRJ_DB_TABLE_ACCOUNT_TYPE . " T ON A.AccountTypeId=T.Id " .

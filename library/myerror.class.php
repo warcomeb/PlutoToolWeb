@@ -108,6 +108,11 @@ class MyError
     const _Transaction_NewAdded        = 500;
     const _Transaction_ErrorAddingNew  = 501;
 
+    const _Vehicle_NewAdded            = 600;
+    const _Vehicle_ErrorAddingNew      = 601;
+    const _Vehicle_ErrorEdit           = 602;
+
+
     /**
      * This function return a error message for each error code.
      *
@@ -140,6 +145,10 @@ class MyError
             return "ERR[".self::_WorkOrder_ErrorEdit."] Can't edit work order.";
         case self::_Transaction_ErrorAddingNew:
             return "ERR[".self::_Transaction_ErrorAddingNew."] Can't add new transaction.";
+        case self::_Vehicle_ErrorAddingNew:
+            return "ERR[".self::_Vehicle_ErrorAddingNew."] Impossibile aggiungere un nuovo veicolo.";
+        case self::_Vehicle_ErrorEdit:
+            return "ERR[".self::_Vehicle_ErrorEdit."] Impossibile modificare il veicolo.";
         default:
             return "ERR[0000] Errore non codificato!";
         }

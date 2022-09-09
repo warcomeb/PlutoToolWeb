@@ -12,9 +12,11 @@
 <?php
 
 // Get the user list
-$query = "SELECT * " .
-         "FROM " . PRJ_DB_TABLE_USER . " " .
-         "ORDER BY Surname";
+$query = "SELECT V.Id, V.Name, V.Plate, V.Active, " .
+         "T.Name as TypeName " .
+         "FROM " . PRJ_DB_TABLE_VEHICLE . " V " .
+         "JOIN " . PRJ_DB_TABLE_VEHICLE_TYPE . " T ON V.VehicleTypeId=T.Id " .
+         "ORDER BY Name";
 
 $result = $db->query($query);
 if ($result)
@@ -27,11 +29,10 @@ if ($result)
         echo "\t\t<thead>\n";
         echo "\t\t\t<tr>\n";
         echo "\t\t\t\t<th>Id</th>\n";
-        echo "\t\t\t\t<th>Cognome</th>\n";
         echo "\t\t\t\t<th>Nome</th>\n";
-        echo "\t\t\t\t<th>Organizzazione</th>\n";
-        echo "\t\t\t\t<th>Sistema</th>\n";
-        echo "\t\t\t\t<th>Adulto?</th>\n";
+        echo "\t\t\t\t<th>Targa</th>\n";
+        echo "\t\t\t\t<th>Tipo</th>\n";
+        echo "\t\t\t\t<th>Attivo</th>\n";
         echo "\t\t\t\t<th>&nbsp;</th>\n";
         echo "\t\t\t</tr>\n";
         echo "\t\t</thead>\n";
@@ -44,16 +45,28 @@ if ($result)
             // Print Pluto-ID
             echo "\t\t\t\t<td>{$row['Id']}</td>\n";
             // Print account name with type icon.
-            echo "\t\t\t\t<td>{$row['Surname']}</td>\n";
             echo "\t\t\t\t<td>{$row['Name']}</td>\n";
-            echo "\t\t\t\t<td>&nbsp;</td>\n";
-            echo "\t\t\t\t<td>&nbsp;</td>\n";
-            echo "\t\t\t\t<td>&nbsp;</td>\n";
+            echo "\t\t\t\t<td>{$row['Plate']}</td>\n";
+            echo "\t\t\t\t<td>{$row['TypeName']}</td>\n";
+            
+            if ($row['Active'] == 1)
+            {            
+                echo "\t\t\t\t<td>".
+                     "<button type=\"button\" class=\"btn btn-outline-success btn-sm\"><i class=\"bi bi-file-earmark-check\"></i></button>".
+                     "</td>\n";
+            }
+            else
+            {
+                echo "\t\t\t\t<td>".
+                     "<button type=\"button\" class=\"btn btn-outline-danger btn-sm\"><i class=\"bi bi-file-earmark-excel\"></i></button>".
+                     "</td>\n";
+            }
+
             // Print command buttons... delete is not usable
             echo "\t\t\t\t<td>";
             echo "<div class=\"btn-group\" role=\"group\" aria-label=\"Commands\">";
-            echo "<a class=\"btn btn-primary btn-sm\" href=\"/records/account/index.php?action=view&id={$row['Id']}\" role=\"button\"><i class=\"bi bi-eye\"></i></a>";
-            echo "<a class=\"btn btn-primary btn-sm\" href=\"/records/account/index.php?action=edit&id={$row['Id']}\" role=\"button\"><i class=\"bi bi-pencil-square\"></i></a>";
+            echo "<a class=\"btn btn-primary btn-sm\" href=\"/records/vehicle/index.php?action=view&id={$row['Id']}\" role=\"button\"><i class=\"bi bi-eye\"></i></a>";
+            echo "<a class=\"btn btn-primary btn-sm\" href=\"/records/vehicle/index.php?action=edit&id={$row['Id']}\" role=\"button\"><i class=\"bi bi-pencil-square\"></i></a>";
             echo "</div>";
             echo "</td>\n";
             echo "\t\t\t</tr>\n";

@@ -1,0 +1,117 @@
+<script type="text/javascript">
+
+<?php
+if (isset($_GET['action']))
+{
+?>
+const pickerPurchase = new tempusDominus.TempusDominus(document.getElementById('vehicle-form-purchase1'), {
+  //put your config here
+    display: {
+        components: {
+            decades: false,
+            year: true,
+            month: true,
+            date: true,
+            hours: false,
+            minutes: false,
+            seconds: false,
+        },
+        theme: 'light'
+    }
+});
+
+<?php 
+}
+
+if ($_GET['action'] == "add")
+{
+    echo "const parsedDate = pickerPurchase.dates.parseInput(new Date());";
+    echo "pickerPurchase.dates.setValue(parsedDate);";
+}
+?>
+
+function save_vehicle()
+{
+    var formData = 
+    {
+        'id'                : $('#vehicle-form-id').val(),
+        'action'            : $('#vehicle-form-type').val(),
+        'name'              : $('#vehicle-form-name').val(),
+        'maker'             : $('#vehicle-form-maker').val(),
+        'model'             : $('#vehicle-form-model').val(),
+        'plate'             : $('#vehicle-form-plate').val(),
+        'purchase'          : $('#vehicle-form-purchase').val(),
+        'type'              : $('#vehicle-form-vtype').val(),
+        'active'            : ($('#vehicle-form-status').is(":checked")) ? 1 : 0,
+        'note'              : $('#vehicle-form-note').val(),
+    };
+
+    // Disable buttons
+    $('#vehicle-form-save').attr("disabled","disabled");
+    $('#vehicle-form-reset').attr("disabled","disabled");
+    // Show loading gift
+    $('#vehicle-form-loading').removeClass('d-none').delay(800);
+
+
+    $.ajax({
+        type        : 'POST',
+        url         : '/records/vehicle/form.php',
+        data        : formData, 
+        dataType    : 'json',
+        encode      : true,
+        success: function(data){ 
+            console.log(data)
+            console.log(data['query'])
+
+            if (typeof data['id'] !== 'undefined')
+            {
+                // Valid vehicle saved!
+                if (0 !== data['id'])
+                {
+                    // Show success message
+                    $('#vehicle-form-loading').addClass('d-none');
+                    $('#vehicle-form-error').addClass('d-none');
+
+                    // TODO: write success message
+                    $('#vehicle-form-success').html('<i class="bi bi-check-square-fill"></i>');
+                    if ("edit" === $('#vehicle-form-type').val())
+                    {
+                        $('#vehicle-form-success').append(' Modifica effettuata con successo!');
+                    }
+                    else if ("add" === $('#vehicle-form-type').val())
+                    {
+                        $('#vehicle-form-success').append(' Salvataggio effettuato con successo!');
+                    }
+                    $('#vehicle-form-success').removeClass('d-none').delay(1000);
+
+                    // Redirect to table page...
+                    $(location).attr('href', '/records/vehicle/index.php?action=view&id=' + data['id']);
+                }
+            }
+            else
+            {
+                // ERROR!!
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log("ERROR: #vehicle-form ajax fail with " + errorThrown);
+            //console.log(XMLHttpRequest.statusText);
+            //console.log(textStatus);   
+
+            // FIXME: manage better the error type!
+            // Write text into error div message
+            $('#vehicle-form-error').html('<i class="bi bi-exclamation-square-fill"></i>');
+            $('#vehicle-form-error').append(' ERR[' + XMLHttpRequest.status + '] ' + XMLHttpRequest.statusText);
+
+            // Show error message
+            $('#vehicle-form-loading').addClass('d-none');
+            $('#vehicle-form-success').addClass('d-none');
+            $('#vehicle-form-error').removeClass('d-none').delay(1000);
+
+            // Enable buttons
+            $('#vehicle-form-save').removeAttr("disabled");
+            $('#vehicle-form-reset').removeAttr("disabled");
+        }  
+    })
+}
+</script>

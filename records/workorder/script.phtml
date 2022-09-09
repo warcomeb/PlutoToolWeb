@@ -1,5 +1,9 @@
 <script type="text/javascript">
 
+<?php
+if (isset($_GET['action']))
+{
+?>
 const pickerStart = new tempusDominus.TempusDominus(document.getElementById('workorder-form-start1'), {
   //put your config here
     display: {
@@ -31,6 +35,16 @@ const pickerEnd = new tempusDominus.TempusDominus(document.getElementById('worko
         theme: 'light'
     }
 });
+<?php 
+}
+
+if ($_GET['action'] == "add")
+{
+    echo "const parsedDate = pickerStart.dates.parseInput(new Date());";
+    echo "pickerStart.dates.setValue(parsedDate);";
+    echo "pickerEnd.dates.setValue(parsedDate);";
+}
+?>
 
 function save_workorder()
 {

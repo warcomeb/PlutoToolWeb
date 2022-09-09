@@ -35,6 +35,8 @@ define("PRJ_DB_TABLE_PAYEE_TYPE"    , "payeetype");
 define("PRJ_DB_TABLE_PAYEE_VEHICLE" , "vehicle");
 define("PRJ_DB_TABLE_PAYEE_HOUSE"   , "vehicle");
 define("PRJ_DB_TABLE_WORKORDER"     , "workorder");
+define("PRJ_DB_TABLE_VEHICLE"       , "vehicle");
+define("PRJ_DB_TABLE_VEHICLE_TYPE"  , "vehicletype");
 // define("PRJ_DB_TABLE_CATEGORY"      , "category");
 // define("PRJ_DB_TABLE_SUBCATEGORY"   , "subcategory");
 // define("PRJ_DB_TABLE_TRANSACTION"   , "transaction");
